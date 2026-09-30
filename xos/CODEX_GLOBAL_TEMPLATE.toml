@@ -1,0 +1,48 @@
+# XOS-Ruflo global Codex template
+# Replace <XOS_RUFLO_ROOT> only after deterministic build/readback.
+# Do not install this globally before the candidate boot gate passes.
+
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+web_search = "disabled"
+
+[features]
+child_agents_md = true
+shell_snapshot = true
+request_rule = true
+remote_compaction = false
+
+[policy]
+mode = "enforce"
+
+[swarm.automation]
+enabled = true
+max_concurrent = 4
+max_writers = 1
+worktree_isolation = true
+dependency_failure = "cancel"
+agent_timeout_seconds = 1800
+max_output_bytes = 1048576
+
+[mcp_servers.ruflo]
+command = "node"
+args = ["<XOS_RUFLO_ROOT>\\v3\\@claude-flow\\cli\\bin\\mcp-server.js"]
+enabled = true
+startup_timeout_sec = 120
+tool_timeout_sec = 120
+
+[mcp_servers.ruflo.env]
+CLAUDE_FLOW_MCP_TRANSPORT = "stdio"
+CLAUDE_FLOW_MEMORY_TYPE = "hybrid"
+CLAUDE_FLOW_STRICT_GUARDRAIL = "true"
+RUFLO_MCP_SKIP_NPX = "1"
+RUFLO_HOOK_SKIP_NPX = "1"
+
+[shell_environment_policy]
+inherit = "core"
+exclude = ["*_KEY", "*_SECRET", "*_TOKEN", "*_PASSWORD"]
+
+[sandbox_workspace_write]
+writable_roots = []
+network_access = false
+exclude_slash_tmp = false
