@@ -1,0 +1,103 @@
+{
+  "xosProfile": "FULL_LOCAL_CODEX",
+  "xosBaseline": {
+    "upstreamTag": "v3.48.0",
+    "upstreamCommit": "bd42d873b0333d3ab7dbcc85c9beb601ef944bd3",
+    "preferredExecutionHost": "codex",
+    "zeroExtraCostDefault": true,
+    "implicitExternalProvider": false,
+    "implicitInstall": false,
+    "movingLatestExecution": false,
+    "externalMcpExposure": false
+  },
+  "orchestrator": {
+    "session": {
+      "persistSessions": true,
+      "dataDir": ".claude-flow/data",
+      "sessionRetentionMs": 3600000
+    },
+    "health": {
+      "checkInterval": 30000,
+      "historyLimit": 100,
+      "degradedThreshold": 1,
+      "unhealthyThreshold": 2
+    },
+    "lifecycle": {
+      "maxConcurrentAgents": 8,
+      "spawnTimeout": 30000,
+      "terminateTimeout": 10000,
+      "maxSpawnRetries": 3
+    }
+  },
+  "memory": {
+    "type": "hybrid",
+    "path": ".claude-flow/memory",
+    "sqlite": {
+      "filename": ".claude-flow/memory/xos-ruflo.db",
+      "inMemory": false,
+      "wal": true
+    },
+    "agentdb": {
+      "dimensions": 1536,
+      "indexType": "hnsw",
+      "efConstruction": 200,
+      "m": 16,
+      "quantization": "none"
+    },
+    "hybrid": {
+      "vectorThreshold": 100
+    }
+  },
+  "mcp": {
+    "name": "xos-ruflo",
+    "version": "3.48.0-xos",
+    "transport": {
+      "type": "stdio"
+    },
+    "capabilities": {
+      "tools": true,
+      "resources": true,
+      "prompts": true,
+      "logging": true
+    }
+  },
+  "swarm": {
+    "topology": "hierarchical-mesh",
+    "maxAgents": 8,
+    "autoScale": {
+      "enabled": true,
+      "minAgents": 1,
+      "maxAgents": 8,
+      "scaleUpThreshold": 0.8,
+      "scaleDownThreshold": 0.3
+    },
+    "coordination": {
+      "consensusRequired": false,
+      "timeoutMs": 10000,
+      "retryPolicy": {
+        "maxRetries": 3,
+        "backoffMs": 500
+      }
+    },
+    "communication": {
+      "protocol": "shared-memory",
+      "batchSize": 10,
+      "flushIntervalMs": 100
+    }
+  },
+  "daemon": {
+    "autoStart": true,
+    "maxConcurrent": 4,
+    "workerTimeoutMs": 1800000,
+    "ttlSecs": 0,
+    "idleSecs": 0,
+    "resourceThresholds": {
+      "maxCpuLoad": 80,
+      "minFreeMemoryPercent": 15
+    },
+    "aiWorkers": {
+      "enabled": false,
+      "reason": "Fail-closed until WorkerDaemon is wired to the existing @claude-flow/codex backend; upstream headless executor is Claude-oriented."
+    }
+  }
+}
