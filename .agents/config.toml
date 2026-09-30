@@ -21,7 +21,7 @@ model = "gpt-5.3-codex"
 # - on-failure: Require approval only after failures
 # - on-request: Require approval for significant changes
 # - never: Auto-approve all actions (use with caution)
-approval_policy = "on-request"
+approval_policy = "never"
 
 # Sandbox mode controls file system access
 # - read-only: Can only read files, no modifications
@@ -33,7 +33,7 @@ sandbox_mode = "workspace-write"
 # - disabled: No web access
 # - cached: Use cached results when available
 # - live: Always fetch fresh results
-web_search = "cached"
+web_search = "disabled"
 
 # =============================================================================
 # Project Documentation
@@ -50,6 +50,22 @@ project_doc_fallback_filenames = [
 ]
 
 # =============================================================================
+# Ruflo Agentic Policy Engine
+# =============================================================================
+
+[policy]
+mode = "enforce"
+
+[swarm.automation]
+enabled = true
+max_concurrent = 4
+max_writers = 1
+worktree_isolation = true
+dependency_failure = "cancel"
+agent_timeout_seconds = 1800
+max_output_bytes = 1048576
+
+# =============================================================================
 # Features
 # =============================================================================
 
@@ -64,17 +80,26 @@ shell_snapshot = true
 request_rule = true
 
 # Enable remote compaction for large histories
-remote_compaction = true
+remote_compaction = false
 
 # =============================================================================
 # MCP Servers
 # =============================================================================
 
-[mcp_servers.claude-flow]
-command = "npx"
-args = ["-y", "@claude-flow/cli@latest"]
+[mcp_servers.ruflo]
+command = "node"
+args = ["v3/@claude-flow/cli/bin/mcp-server.js"]
 enabled = true
+startup_timeout_sec = 120
 tool_timeout_sec = 120
+
+[mcp_servers.ruflo.env]
+CLAUDE_FLOW_MCP_TRANSPORT = "stdio"
+CLAUDE_FLOW_MEMORY_TYPE = "hybrid"
+CLAUDE_FLOW_STRICT_GUARDRAIL = "true"
+RUFLO_MCP_ENFORCE_POLICY = "1"
+RUFLO_HOOK_SKIP_NPX = "1"
+RUFLO_MCP_SKIP_NPX = "1"
 
 # =============================================================================
 # Skills Configuration
@@ -103,8 +128,8 @@ enabled = true
 # Development profile - more permissive for local work
 [profiles.dev]
 approval_policy = "never"
-sandbox_mode = "danger-full-access"
-web_search = "live"
+sandbox_mode = "workspace-write"
+web_search = "disabled"
 
 # Safe profile - maximum restrictions
 [profiles.safe]
@@ -116,7 +141,7 @@ web_search = "disabled"
 [profiles.ci]
 approval_policy = "never"
 sandbox_mode = "workspace-write"
-web_search = "cached"
+web_search = "disabled"
 
 # =============================================================================
 # History
@@ -146,7 +171,7 @@ exclude = ["*_KEY", "*_SECRET", "*_TOKEN", "*_PASSWORD"]
 writable_roots = []
 
 # Allow network access
-network_access = true
+network_access = false
 
 # Exclude temp directories
 exclude_slash_tmp = false
